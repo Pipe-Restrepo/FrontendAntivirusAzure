@@ -21,7 +21,8 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '~20'
+          node-version: '20'
+          cache: 'npm'
 
       - name: npm install, build, and test
         run: |
@@ -29,20 +30,23 @@ jobs:
           npm run build --if-present
           npm run test --if-present
       
-      - name: Create deployment package (exclude node_modules)
+      - name: Create deployment package
         run: |
           # Crear carpeta para deployment
           mkdir deployment-package
           
-          # Copiar archivos necesarios (SIN node_modules)
+          # Copiar archivos necesarios
           Copy-Item -Path "build" -Destination "deployment-package/build" -Recurse -ErrorAction SilentlyContinue
           Copy-Item -Path "public" -Destination "deployment-package/public" -Recurse -ErrorAction SilentlyContinue
+          Copy-Item -Path "app" -Destination "deployment-package/app" -Recurse -ErrorAction SilentlyContinue
           Copy-Item -Path "package.json" -Destination "deployment-package/" -ErrorAction SilentlyContinue
           Copy-Item -Path "package-lock.json" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          Copy-Item -Path "vite.config.ts" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          Copy-Item -Path "tsconfig.json" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          Copy-Item -Path "tailwind.config.*" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          Copy-Item -Path "postcss.config.*" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          Copy-Item -Path ".env*" -Destination "deployment-package/" -ErrorAction SilentlyContinue
           Copy-Item -Path "web.config" -Destination "deployment-package/" -ErrorAction SilentlyContinue
-          
-          # Si tienes server.js en la raíz, copiarlo también
-          Copy-Item -Path "server.js" -Destination "deployment-package/" -ErrorAction SilentlyContinue
           
         shell: powershell
       
@@ -81,4 +85,4 @@ jobs:
         with:
           app-name: 'FrontendAntivirusAzure'
           slot-name: 'Production'
-          package: 
+          package: .
