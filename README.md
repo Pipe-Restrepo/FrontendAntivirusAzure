@@ -41,3 +41,4 @@ This template comes with [Tailwind CSS](https://tailwindcss.com/) already config
 # AntivirusAzure
 # FrontendAntivirusAzure
 # FrontendAntivirusAzure
+# FrontendAntivirusAzure
