@@ -32,17 +32,30 @@ jobs:
       - name: Create deployment package (exclude node_modules)
         run: |
           # Crear carpeta para deployment
-          mkdir deployment-package
+          New-Item -ItemType Directory -Force -Path "deployment-package"
           
-          # Copiar archivos necesarios (SIN node_modules)
-          Copy-Item -Path "build" -Destination "deployment-package/build" -Recurse -ErrorAction SilentlyContinue
-          Copy-Item -Path "public" -Destination "deployment-package/public" -Recurse -ErrorAction SilentlyContinue
-          Copy-Item -Path "package.json" -Destination "deployment-package/" -ErrorAction SilentlyContinue
-          Copy-Item -Path "package-lock.json" -Destination "deployment-package/" -ErrorAction SilentlyContinue
-          Copy-Item -Path "web.config" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          # Verificar que build existe
+          if (Test-Path "build") {
+            Copy-Item -Path "build" -Destination "deployment-package/" -Recurse -Force
+            Write-Host "✓ Carpeta build copiada"
+          } else {
+            Write-Host "✗ ERROR: Carpeta build no existe"
+            exit 1
+          }
           
-          # Si tienes server.js en la raíz, copiarlo también
-          Copy-Item -Path "server.js" -Destination "deployment-package/" -ErrorAction SilentlyContinue
+          # Copiar otros archivos necesarios
+          if (Test-Path "public") {
+            Copy-Item -Path "public" -Destination "deployment-package/" -Recurse -Force
+            Write-Host "✓ Carpeta public copiada"
+          }
+          
+          Copy-Item -Path "package.json" -Destination "deployment-package/" -Force
+          Copy-Item -Path "package-lock.json" -Destination "deployment-package/" -Force
+          Copy-Item -Path "web.config" -Destination "deployment-package/" -Force
+          
+          # Mostrar contenido final
+          Write-Host "Contenido de deployment-package:"
+          Get-ChildItem -Path "deployment-package" -Recurse | Select-Object Name, FullName
           
         shell: powershell
       
